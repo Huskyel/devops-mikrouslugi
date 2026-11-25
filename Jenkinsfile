@@ -2,7 +2,6 @@ pipeline {
     agent any
     environment {
         APP_NAME = "moja-aplikacja"
-        CONTAINER_NAME = "aplikacja-prod"
         APP_VERSION = "1.0.${BUILD_NUMBER}"
     }
     stages {
@@ -21,18 +20,15 @@ pipeline {
                 sh "docker build --build-arg APP_VERSION=${APP_VERSION} -t ${APP_NAME}:${APP_VERSION} -t ${APP_NAME}:latest ."
             }
         }
-        stage('Wdrozenie') {
+        stage('Wdrozenie Compose') {
             steps {
-                sh "docker tag ${APP_NAME}:${APP_VERSION} ${APP_NAME}:previous || true"
-                sh "docker rm -f ${CONTAINER_NAME} || true"
-                sh "docker run -d --name ${CONTAINER_NAME} -p 5000:5000 ${APP_NAME}:${APP_VERSION}"
+                sh "docker compose up -d --build"
             }
         }
     }
     post {
         failure {
-            sh "docker rm -f ${CONTAINER_NAME} || true"
-            sh "docker run -d --name ${CONTAINER_NAME} -p 5000:5000 ${APP_NAME}:previous || true"
+            sh "docker compose stop web || true"
         }
     }
 }
