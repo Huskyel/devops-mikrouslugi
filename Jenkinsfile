@@ -25,6 +25,18 @@ pipeline {
                 sh "docker-compose up -d --build"
             }
         }
+        stage('Wdrozenie Staging') {
+            steps {
+                sh "docker rm -f app-staging || true"
+                sh "docker run -d --name app-staging -p 5001:5000 -e APP_VERSION=${APP_VERSION} ${APP_NAME}:${APP_VERSION}"
+            }
+        }
+        stage('Wdrozenie Production') {
+            steps {
+                sh "docker rm -f app-prod-env || true"
+                sh "docker run -d --name app-prod-env -p 5002:5000 -e APP_VERSION=${APP_VERSION} ${APP_NAME}:${APP_VERSION}"
+            }
+        }
     }
     post {
         failure {
