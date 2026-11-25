@@ -22,13 +22,13 @@ pipeline {
         }
         stage('Wdrozenie Compose') {
             steps {
-                sh "docker compose up -d --build"
+                sh "docker-compose up -d --build"
             }
         }
     }
     post {
         failure {
-            sh "docker compose stop web || true"
+            sh "docker-compose stop web || true"
         }
     }
 }
